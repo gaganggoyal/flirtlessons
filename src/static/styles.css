@@ -26,10 +26,11 @@
   --accent: #c63d57;
   --accent-ink: #ffffff;
   --accent-soft: #fbe5e9;
+  --accent-text: #b3354e; /* rose text on rose-tinted backgrounds (AA 4.95:1) */
   --ink: #2a2230;
-  --green: #2a7d52;
+  --green: #23704a;
   --green-soft: #e3f3ea;
-  --amber: #9a6514;
+  --amber: #835511;
   --amber-soft: #fbf0dc;
   --red: #b5372f;
   --red-soft: #fbe4e2;
@@ -42,7 +43,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #151216; --surface: #1e1a20; --tint: #1b171d; --text: #efe9ec; --muted: #a99fa6;
-    --rule: #332c35; --accent: #f06b82; --accent-ink: #1a0f13; --accent-soft: #3a1e26; --ink: #f3e9ee;
+    --rule: #332c35; --accent: #f06b82; --accent-ink: #1a0f13; --accent-soft: #3a1e26; --accent-text: #f06b82; --ink: #f3e9ee;
     --green: #5cc28e; --green-soft: #1b2e24; --amber: #e3a948; --amber-soft: #33291a;
     --red: #ef7a72; --red-soft: #3a1f1d; --bubble-them: #2b252e;
     --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
@@ -50,7 +51,7 @@
 }
 :root[data-theme="dark"] {
   --bg: #151216; --surface: #1e1a20; --tint: #1b171d; --text: #efe9ec; --muted: #a99fa6;
-  --rule: #332c35; --accent: #f06b82; --accent-ink: #1a0f13; --accent-soft: #3a1e26; --ink: #f3e9ee;
+  --rule: #332c35; --accent: #f06b82; --accent-ink: #1a0f13; --accent-soft: #3a1e26; --accent-text: #f06b82; --ink: #f3e9ee;
   --green: #5cc28e; --green-soft: #1b2e24; --amber: #e3a948; --amber-soft: #33291a;
   --red: #ef7a72; --red-soft: #3a1f1d; --bubble-them: #2b252e;
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
@@ -94,7 +95,7 @@ section, article { scroll-margin-top: 70px; }
 .btn.primary { background: var(--accent); color: var(--accent-ink); }
 .btn.ghost { border-color: var(--rule); color: var(--text); background: var(--surface); }
 .btn.ghost:hover { border-color: var(--accent); }
-.icon-btn { width: 38px; height: 38px; border-radius: 10px; border: 1px solid var(--rule); background: var(--surface); color: var(--text); cursor: pointer; font-size: 16px; }
+.icon-btn { width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--rule); background: var(--surface); color: var(--text); cursor: pointer; font-size: 16px; }
 .icon-btn:hover { border-color: var(--accent); }
 
 /* ---------- Nav ---------- */
@@ -153,7 +154,7 @@ section, article { scroll-margin-top: 70px; }
 .box.key { background: var(--surface); border: 1px solid var(--rule); }
 .box.key strong { color: var(--muted); }
 .box.try { background: var(--accent-soft); }
-.box.try strong { color: var(--accent); }
+.box.try strong { color: var(--accent-text); }
 
 .signals { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
 .signal { border-radius: 14px; padding: 18px; font-size: 15px; }
@@ -222,7 +223,7 @@ section, article { scroll-margin-top: 70px; }
 .g-card h3 { font-size: 1.15rem; }
 .g-card p { color: var(--muted); font-size: 15px; }
 .g-emoji { font-size: 28px; margin-bottom: 10px; }
-.tag { margin-top: auto; align-self: flex-start; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; }
+.tag { margin-top: auto; align-self: flex-start; font-size: 12px; font-weight: 600; color: var(--accent-text); background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; }
 
 /* ---------- FAQ ---------- */
 .faq { display: flex; flex-direction: column; gap: 10px; }
@@ -308,7 +309,7 @@ section, article { scroll-margin-top: 70px; }
 .pager .next { text-align: right; grid-column: 2; }
 .more { padding: 64px 0 88px; background: var(--tint); border-top: 1px solid var(--rule); }
 .more h2 { margin-bottom: 24px; }
-.nav-links a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
+.nav-links a[aria-current="page"] { color: var(--accent-text); background: var(--accent-soft); }
 .center-block { margin: 0 auto 28px; }
 .center-row { justify-content: center; }
 
@@ -320,8 +321,6 @@ section, article { scroll-margin-top: 70px; }
 }
 
 /* ---------- Responsive ---------- */
-@media (max-width: 1000px) {
-}
 @media (max-width: 860px) {
   .hero-grid { grid-template-columns: 1fr; gap: 48px; }
   .principle-grid, .signals { grid-template-columns: 1fr; }
