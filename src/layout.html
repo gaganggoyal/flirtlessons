@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title_tag}}</title>
+<meta name="description" content="{{description}}">
+{{canonical}}<meta name="robots" content="{{robots}}">
+<meta name="theme-color" content="#c63d57">
+
+<meta property="og:type" content="{{og_type}}">
+<meta property="og:site_name" content="Flirt Lessons">
+<meta property="og:title" content="{{og_title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:url" content="{{url}}">
+<meta property="og:image" content="https://flirtlessons.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Flirt Lessons — how to flirt with confidence and respect">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{og_title}}">
+<meta name="twitter:description" content="{{description}}">
+<meta name="twitter:image" content="https://flirtlessons.com/og-image.png">
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/styles.css?v={{css_v}}">
+{{jsonld}}
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="/" aria-label="Flirt Lessons home">
+      <span class="logo-mark" aria-hidden="true">fl</span>
+      <span>Flirt Lessons</span>
+    </a>
+    <nav id="navLinks" class="nav-links" aria-label="Main">
+{{nav_links}}
+    </nav>
+    <div class="nav-actions">
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="Toggle dark mode">◐</button>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-controls="navLinks" aria-expanded="false">☰</button>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+{{content}}
+</main>
+
+<footer class="footer">
+  <div class="wrap footer-inner">
+    <span>© <span id="year">2026</span> Flirt Lessons. All content original.</span>
+    <nav class="footer-links" aria-label="Footer">
+      <a href="/legal/#about">About</a>
+      <a href="/legal/#disclaimer">Disclaimer</a>
+      <a href="/legal/#privacy">Privacy</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="/main.js?v={{js_v}}" defer></script>
+</body>
+</html>

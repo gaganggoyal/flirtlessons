@@ -1,0 +1,12 @@
+{
+  "name": "Flirt Lessons",
+  "short_name": "Flirt Lessons",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#fbf8f5",
+  "theme_color": "#d0465f",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
