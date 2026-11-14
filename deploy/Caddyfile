@@ -13,6 +13,9 @@
 	@indexFile path_regexp idx ^(.*/)index\.html$
 	redir @indexFile {re.idx.1} permanent
 
+	# The error page itself is not a real page: requesting it directly returns 404, not 200.
+	error /404.html 404
+
 	# ---- Funnel events (see docs/measurement.md) ----
 	# The container never sees visitor IPs (the edge proxy doesn't forward a trusted
 	# client IP) and the filter drops host, IP and header fields, so each line holds
@@ -49,14 +52,14 @@
 		file_server
 	}
 
-	# styles.css / main.js / challenge.js are always requested with ?v=<content hash>
-	@versioned path /styles.css /main.js /challenge.js
+	# styles.css / main.js / challenge.js / quiz.js are always requested with ?v=<content hash>
+	@versioned path /styles.css /main.js /challenge.js /quiz.js
 	header @versioned Cache-Control "public, max-age=31536000, immutable"
 
 	@assets path *.woff2 *.png *.svg *.ico *.webmanifest
 	header @assets Cache-Control "public, max-age=2592000"
 
-	@pages not path /styles.css /main.js /challenge.js *.woff2 *.png *.svg *.ico *.webmanifest
+	@pages not path /styles.css /main.js /challenge.js /quiz.js *.woff2 *.png *.svg *.ico *.webmanifest
 	header @pages Cache-Control "public, max-age=300"
 
 	header -Server

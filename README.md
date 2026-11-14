@@ -11,6 +11,8 @@ src/
   static/          CSS, JS, fonts, icons, robots.txt (copied as-is)
 build.py           builds src/ -> site/ (standard library only)
 deploy.sh          builds, then uploads site/ to the server
+tools/make_og.py   renders per-page social cards into src/static/og/ (needs Google Chrome)
+tools/events_report.py  funnel report from the event log
 ```
 
 `site/` is generated and wiped on every build. Edit `src/`, never `site/`.
@@ -29,9 +31,13 @@ JSON-LD (Article, BreadcrumbList, FAQPage), breadcrumbs, previous/next links,
 ### Adding a page
 
 1. Create `src/pages/<slug>.html` with a meta header (copy an existing lesson).
-2. To put it in the lesson or tool series, add the slug to `LESSONS` or `TOOLS` in `build.py`.
-   Optional meta: `og_image` (path under `src/static/`), `og_title`, `scripts` (extra JS files), `related`.
-3. Run `python3 build.py`. It is published at `/<slug>/` and added to the sitemap.
+2. Add the slug to `LESSONS`, `TOOLS` or `GUIDES` in `build.py`.
+   Required for series pages: `answer` (a 40–60 word "Short answer" shown under the header; tool pages
+   can place it with `{{answer}}`). Optional meta: `sources` (`[{"cite": ..., "url": "https://doi.org/..."}]`,
+   rendered as a Sources list and as Article `citation`), `og_image`, `og_image_alt`, `og_title`,
+   `scripts` (extra JS files), `related`.
+3. Run `python3 tools/make_og.py <slug>` to render its social card, then `python3 build.py`.
+   It is published at `/<slug>/` and added to the sitemap.
 
 FAQ entries written as `<details><summary>Q</summary><p>A</p></details>` are
 picked up automatically for FAQPage structured data.
@@ -39,15 +45,14 @@ picked up automatically for FAQPage structured data.
 ## Tests
 
 ```sh
-python3 -m unittest discover -s tests   # build + SEO guarantees, funnel report
-node --test tests/                      # 3-message challenge engine (every answer path)
+python3 -m unittest discover -s tests   # build + SEO guarantees, social cards, sources, funnel report
+node --test tests/                      # challenge engine (every answer path) and quiz (every answer sheet)
 ```
 
 ## Docs
 
-- `docs/measurement.md`: funnel events (built, switched off), dashboard, privacy design
+- `docs/measurement.md`: funnel events (on in code, live after the next deploy), dashboard, privacy design
 - `deploy/README.md`: hosting setup and server changes waiting for approval
-- `tools/events_report.py`: funnel report from the event log
 
 ## Deploy
 

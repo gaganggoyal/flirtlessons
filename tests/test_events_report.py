@@ -41,6 +41,24 @@ class EventsReportTest(unittest.TestCase):
         self.assertIn("small samples", text)  # 20, 5 and 10 are all < 30
         self.assertIn("AI cost per completed session: 0", text)
 
+    def test_quiz_funnel_is_separate_from_the_challenge(self):
+        L = self.sample()
+        L += [line("/e?n=landing_view&p=%2Ffriend-zone-quiz%2F&src=direct")] * 12
+        L += [line("/e?n=quiz_start&scn=friend-zone-v1&p=%2Ffriend-zone-quiz%2F")] * 9
+        L += [line("/e?n=quiz_complete&scn=friend-zone-v1&rt=slow")] * 6
+        L += [line("/e?n=quiz_share&scn=friend-zone-v1&via=copy")] * 2
+        L += [line("/e?n=referred_visit&scn=friend-zone-v1&p=%2Ffriend-zone-quiz%2F")] * 3
+        L += [line("/e?n=referred_completion&scn=friend-zone-v1")] * 1
+        out = io.StringIO()
+        counts, mult = er.report(er.parse(L), out)
+        # The quiz's referred_* events must not inflate the challenge funnel.
+        self.assertEqual(counts["referred_visit"], 10)
+        self.assertEqual(counts["referred_completion"], 4)
+        self.assertAlmostEqual(mult, 0.2)
+        q = er.quiz_counts(er.parse(L))
+        self.assertEqual([q[k] for k in er.QUIZ_FUNNEL], [12, 9, 6, 2, 3, 1])
+        self.assertIn("slow 6", out.getvalue())
+
     def test_since_filter(self):
         old = [line("/e?n=challenge_complete&sb=0-9", ts=1700000000)]
         import datetime

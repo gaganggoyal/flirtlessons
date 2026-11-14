@@ -50,7 +50,15 @@ TOOLS = [
     "attractive-habits",
     "fun-date-games",
 ]
-SERIES = LESSONS + TOOLS
+# Problem-named pages for what people actually search (see reports/ research).
+GUIDES = [
+    "how-to-ask-someone-out",
+    "what-is-rizz",
+]
+SERIES = LESSONS + TOOLS + GUIDES
+SECTIONS = {"lessons": ("Lessons", "/#lessons", LESSONS, "Read the lesson"),
+            "tools": ("Tools", "/#tools", TOOLS, "Open the tool"),
+            "guides": ("Guides", "/#guides", GUIDES, "Read the guide")}
 
 NAV = [
     ("Lessons", "/#lessons", None),
@@ -111,7 +119,27 @@ def load_pages():
 
 
 def og_image(p):
-    return BASE + p["og_image"] if p.get("og_image") else OG_IMAGE
+    """Explicit og_image, else a generated card at /og/<slug>.png (tools/make_og.py), else the site card."""
+    if p.get("og_image"):
+        return BASE + p["og_image"]
+    if (SRC / "static" / "og" / f"{p['slug']}.png").exists():
+        return f"{BASE}/og/{p['slug']}.png"
+    return OG_IMAGE
+
+
+def og_alt(p):
+    if p.get("og_image_alt"):
+        return p["og_image_alt"]
+    if og_image(p) != OG_IMAGE:
+        return f"{plain(p.get('h1', p['title']))} — Flirt Lessons"
+    return OG_ALT
+
+
+def section_of(slug):
+    for key, (_name, _href, slugs, _cta) in SECTIONS.items():
+        if slug in slugs:
+            return key
+    return None
 
 
 def faq_items(body):
@@ -133,7 +161,17 @@ def card(p, cta):
 
 
 def cta_for(p):
-    return "Read the lesson" if p["slug"] in LESSONS else "Open the tool"
+    return SECTIONS[section_of(p["slug"])][3]
+
+
+def sources_html(p):
+    """meta "sources": [{"cite": "Author (year). Title. Journal.", "url": "https://doi.org/..."}]"""
+    rows = p.get("sources") or []
+    if not rows:
+        return ""
+    items = "".join(f'<li>{esc(r["cite"])} <a href="{esc(r["url"])}" rel="noopener">{esc(r["url"].split("//", 1)[1])}</a></li>'
+                    for r in rows)
+    return f'<h2 id="sources">Sources</h2><ol class="sources">{items}</ol>'
 
 
 def nav_links(current):
@@ -164,6 +202,9 @@ def jsonld(p, today):
             {"@type": "Article", "@id": url + "#article", "headline": plain(p.get("h1", p["title"]))[:110],
              "description": p["description"], "image": og_image(p), "inLanguage": "en",
              "datePublished": p.get("published", today), "dateModified": p.get("updated", today),
+             **({"abstract": p["answer"]} if p.get("answer") else {}),
+             **({"citation": [{"@type": "CreativeWork", "name": r["cite"], "url": r["url"]}
+                              for r in p["sources"]]} if p.get("sources") else {}),
              "author": {"@type": "Organization", "name": BRAND, "url": BASE + "/"},
              "publisher": {"@type": "Organization", "name": BRAND,
                            "logo": {"@type": "ImageObject", "url": BASE + "/apple-touch-icon.png"}},
@@ -189,7 +230,7 @@ def article_wrap(p, pages, today):
     words = len(plain(p["body"]).split())
     minutes = max(2, round(words / 220))
     updated = datetime.date.fromisoformat(p.get("updated", today)).strftime("%-d %B %Y")
-    section, section_href = ("Lessons", "/#lessons") if p["slug"] in LESSONS else ("Tools", "/#tools")
+    section, section_href = SECTIONS[section_of(p["slug"])][:2]
     crumbs = (f'<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> <span aria-hidden="true">›</span> '
               f'<a href="{section_href}">{section}</a> <span aria-hidden="true">›</span> '
               f'<span aria-current="page">{esc(p["label"])}</span></nav>')
@@ -198,6 +239,10 @@ def article_wrap(p, pages, today):
             f'<h1 id="page-title">{p["h1"]}</h1>'
             f'<p class="lede">{p["lede"]}</p>'
             f'<p class="meta">{minutes} min read · Updated {updated}</p></header>')
+    answer = (f'<div class="answer"><p class="answer-label">Short answer</p><p>{esc(p["answer"])}</p></div>'
+              if p.get("answer") else "")
+    # Tool pages put {{answer}} after the tool itself; everything else gets it at the top.
+    prose = p["body"].replace("{{answer}}", answer) if "{{answer}}" in p["body"] else answer + "\n" + p["body"]
     i = SERIES.index(p["slug"])
     prev_p = pages[SERIES[i - 1]] if i > 0 else None
     next_p = pages[SERIES[i + 1]] if i + 1 < len(SERIES) else None
@@ -210,7 +255,7 @@ def article_wrap(p, pages, today):
     related = p.get("related") or [s for s in (SERIES[i + 1:] + SERIES[:i]) if s != p["slug"]][:3]
     cards = "".join(card(pages[s], cta_for(pages[s])) for s in related)
     return (f'<article class="article" aria-labelledby="page-title"><div class="wrap article-wrap">{head}'
-            f'<div class="prose">\n{p["body"]}\n</div>{pager}</div></article>'
+            f'<div class="prose">{prose}\n{sources_html(p)}</div>{pager}</div></article>'
             f'<section class="more" aria-labelledby="more-title"><div class="wrap">'
             f'<h2 id="more-title">Keep learning</h2><div class="card-grid">{cards}</div></div></section>')
 
@@ -235,6 +280,7 @@ def build():
         body = p["body"]
         body = body.replace("{{lesson_cards}}", "".join(card(pages[s], cta_for(pages[s])) for s in LESSONS))
         body = body.replace("{{tool_cards}}", "".join(card(pages[s], cta_for(pages[s])) for s in TOOLS))
+        body = body.replace("{{guide_cards}}", "".join(card(pages[s], cta_for(pages[s])) for s in GUIDES))
         p["body"] = body
         content = article_wrap(p, pages, today) if slug in SERIES else body
         title = p["title"]
@@ -252,7 +298,7 @@ def build():
             "js_v": js_v,
             "jsonld": jsonld(p, today),
             "og_image": og_image(p),
-            "og_image_alt": esc(p.get("og_image_alt", OG_ALT)),
+            "og_image_alt": esc(og_alt(p)),
             "analytics": "on" if ANALYTICS_ENABLED else "off",
             "page_scripts": "".join(f'<script src="/{n}?v={ver(n)}" defer></script>\n' for n in p.get("scripts", [])),
             "nav_links": nav_links(slug),

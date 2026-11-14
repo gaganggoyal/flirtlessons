@@ -1,6 +1,8 @@
 # Measurement: funnel events
 
-Status: **on since 14 November 2026**, together with the matching privacy text on `/legal/`.
+Status: **switched on in code** (`ANALYTICS_ENABLED = True`, with the matching privacy text on `/legal/`).
+It goes live with the next deploy of the site **and** the container config in `deploy/` (the `/e`
+endpoint and log). Until both are deployed, nothing is collected.
 To stop it: set `ANALYTICS_ENABLED = False` in `build.py`, comment out the events block in
 `deploy/Caddyfile`, redeploy both. The log can be deleted at any time.
 
@@ -16,9 +18,10 @@ To stop it: set `ANALYTICS_ENABLED = False` in `build.py`, comment out the event
 | `n` | event name | `challenge_complete` |
 | `p` | page path | `/rizz-test/` |
 | `src` | `utm_source`, else referrer hostname, else `direct` | `whatsapp`, `instagram.com` |
-| `scn` | scenario id | `chai-momo-v1` |
-| `sb` | score bucket (10-point bands) | `60-69` |
-| `ref` | `beat` when the visitor arrived via a friend's challenge link | `beat` |
+| `scn` | scenario id: `chai-momo-v1` (challenge) or `friend-zone-v1` (quiz) | `chai-momo-v1` |
+| `sb` | challenge score bucket (10-point bands) | `60-69` |
+| `rt` | quiz result type (one of four labels, never the answers) | `slow` |
+| `ref` | `beat` (challenge) or `friend` (quiz) when the visitor arrived via a friend's link | `beat` |
 | `via` | share channel | `native`, `whatsapp`, `x`, `copy` |
 
 - **No IPs or headers in the log.** The site container sits behind the edge proxy and never
@@ -38,8 +41,17 @@ To stop it: set `ANALYTICS_ENABLED = False` in `build.py`, comment out the event
 | `result_share_click` | every share click, with `via` | none (diagnostics only) |
 | `result_share_complete` | native share sheet reports success | per success |
 | `result_card_download` | result card downloaded | per click |
-| `referred_visit` | challenge page opened with `?beat=` | once per page load |
+| `referred_visit` | challenge opened with `?beat=`, or quiz opened with `?r=` (told apart by `scn`) | once per page load |
 | `referred_completion` | a referred visitor completes | once per page load |
+| `quiz_start` | first answer chosen on the friend-zone quiz | once per page load |
+| `quiz_complete` | quiz result shown, with `rt` | once per attempt (until "Start over") |
+| `quiz_share` | first share action on a quiz result | once per attempt |
+| `quiz_share_click` | every quiz share click, with `via` | none (diagnostics only) |
+| `quiz_share_complete` | native share sheet reports success | per success |
+| `quiz_card_download` | quiz result card downloaded | per click |
+
+Quiz share links are `/friend-zone-quiz/?r=<type>`: they carry the result type only. The quiz form
+uses `method="dialog"`, so even without JavaScript the answers can never be submitted to the server.
 
 `signup` and `purchase` from the brief are **not implemented**: the site has no accounts or payments.
 
@@ -57,6 +69,9 @@ platforms that report it. `referred_visit` is the reliable downstream signal.
   This estimates new completed challenges per completion. It is not a forecast, and with no IDs it
   assumes the counts describe comparable cohorts.
 - Share clicks by channel, card downloads, score distribution, landings and starts by source, top pages
+- **Quiz funnel:** `landing_view (/friend-zone-quiz/) → quiz_start → quiz_complete → quiz_share → referred_visit → referred_completion`,
+  plus result types and share channels. Shared event names (`referred_*`) are split by `scn`, so the
+  quiz never inflates the challenge funnel.
 - A small-sample warning whenever a key count is below 30
 
 Diagnostic map (from the brief):

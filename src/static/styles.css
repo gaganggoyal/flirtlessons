@@ -384,3 +384,21 @@ section, article { scroll-margin-top: 70px; }
   .challenge { padding: 18px; border-radius: 18px; }
   .ch-traits { grid-template-columns: 1fr; }
 }
+
+/* ---------- Short answer, sources, quiz result types ---------- */
+.answer { background: var(--surface); border: 1px solid var(--rule); border-left: 4px solid var(--accent); border-radius: 0 14px 14px 0; padding: 16px 20px; margin: 0 0 36px; max-width: 720px; }
+.answer-label { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-text); margin: 0 0 6px; }
+.answer p:last-child { margin: 0; font-size: 1.02rem; }
+.sources { font-size: 14px; color: var(--muted); padding-left: 20px; max-width: 720px; }
+.sources li { margin-bottom: 8px; }
+.sources a { overflow-wrap: anywhere; }
+.types { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin: 16px 0 20px; }
+.type { background: var(--surface); border: 1px solid var(--rule); border-radius: 14px; padding: 16px 18px; }
+.type h3 { font-family: var(--display); font-style: italic; color: var(--accent-text); font-size: 1.15rem; margin-bottom: 6px; }
+.type p { margin: 0; font-size: 15px; color: var(--muted); }
+.qr-type { color: var(--accent); font-style: italic; margin: 6px 0 8px; font-size: clamp(1.8rem, 5vw, 2.4rem); }
+.qr-type:focus { outline: none; }
+.qr-signal { display: flex; justify-content: space-between; align-items: baseline; margin-top: 18px; }
+.qr-signal span { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.qr-signal b { font-family: var(--display); font-size: 1.6rem; color: var(--ink); }
+.qr-points { margin-top: 0; }

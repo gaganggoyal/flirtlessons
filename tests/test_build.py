@@ -95,6 +95,69 @@ class BuildTest(unittest.TestCase):
         self.assertIn(f'property="og:image" content="{BASE}/og/rizz-test.png"', s)
         self.assertNotIn("challenge.js", self.pages[SITE / "index.html"])
 
+    def article_pages(self):
+        sys.path.insert(0, str(ROOT))
+        import build
+        return build, {slug: self.pages[SITE / slug / "index.html"] for slug in build.SERIES}
+
+    def test_every_article_has_a_40_to_60_word_short_answer(self):
+        _, arts = self.article_pages()
+        for slug, s in arts.items():
+            m = re.search(r'<div class="answer"><p class="answer-label">Short answer</p><p>(.*?)</p></div>', s)
+            self.assertIsNotNone(m, f"{slug}: no short answer")
+            n = len(html.unescape(re.sub(r"<[^>]+>", " ", m.group(1))).split())
+            self.assertTrue(40 <= n <= 60, f"{slug}: short answer is {n} words")
+
+    def test_every_article_has_its_own_1200x630_social_card(self):
+        import struct
+        _, arts = self.article_pages()
+        seen = set()
+        for slug, s in arts.items():
+            img = re.search(r'property="og:image" content="([^"]+)"', s).group(1)
+            self.assertNotEqual(img, f"{BASE}/og-image.png", f"{slug} uses the generic card")
+            self.assertNotIn(img, seen, f"{slug} shares a card")
+            seen.add(img)
+            data = (SITE / img.removeprefix(BASE + "/")).read_bytes()
+            self.assertEqual(data[:8], b"\x89PNG\r\n\x1a\n", slug)
+            self.assertEqual(struct.unpack(">II", data[16:24]), (1200, 630), slug)
+            self.assertIn('name="twitter:image:alt" content="', s)
+
+    def test_sources_are_linked_and_match_article_citations(self):
+        _, arts = self.article_pages()
+        cited = 0
+        for slug, s in arts.items():
+            listed = re.findall(r'<ol class="sources">(.*?)</ol>', s, re.S)
+            links = re.findall(r'<a href="([^"]+)"', listed[0]) if listed else []
+            for u in links:
+                self.assertTrue(u.startswith("https://"), f"{slug}: {u}")
+            graph = json.loads(re.search(r'<script type="application/ld\+json">([\s\S]*?)</script>', s)
+                               .group(1).replace("<\\/", "</"))["@graph"]
+            article = next(n for n in graph if n["@type"] == "Article")
+            self.assertEqual([c["url"] for c in article.get("citation", [])], links, slug)
+            cited += bool(links)
+        self.assertGreaterEqual(cited, 4)
+
+    def test_quiz_page_loads_quiz_script_and_main_js_no_longer_holds_it(self):
+        s = self.pages[SITE / "friend-zone-quiz" / "index.html"]
+        self.assertRegex(s, r'<script src="/quiz\.js\?v=[0-9a-f]{8}" defer>')
+        self.assertIn('data-share-native', s)
+        self.assertNotIn("quizResult", text(SITE / "main.js"))
+        for f, page in self.pages.items():
+            if f != SITE / "friend-zone-quiz" / "index.html":
+                self.assertNotIn("quiz.js", page, f)
+
+    def test_home_links_every_lesson_tool_and_guide(self):
+        build, _ = self.article_pages()
+        home = self.pages[SITE / "index.html"]
+        for slug in build.SERIES:
+            self.assertIn(f'href="/{slug}/"', home, slug)
+
+    def test_attractive_pages_target_different_queries(self):
+        a = re.search(r"<title>(.*?)</title>", self.pages[SITE / "how-to-be-more-attractive" / "index.html"]).group(1)
+        b = re.search(r"<title>(.*?)</title>", self.pages[SITE / "attractive-habits" / "index.html"]).group(1)
+        self.assertIn("How to Be More Attractive", a)
+        self.assertNotIn("More Attractive", b)
+
 
 if __name__ == "__main__":
     unittest.main()

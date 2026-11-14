@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Funnel report for the 3-message challenge, from the cookieless event log.
+"""Funnel report for the 3-message challenge and the friend-zone quiz, from the cookieless event log.
 
     python3 tools/events_report.py events.log [--since 2026-11-15] [--scn chai-momo-v1]
 
@@ -19,6 +19,9 @@ from urllib.parse import parse_qs, urlsplit
 
 FUNNEL = ["landing_view", "challenge_start", "challenge_complete", "result_share",
           "referred_visit", "referred_completion"]
+QUIZ_SCN = "friend-zone-v1"
+QUIZ_FUNNEL = ["landing_view", "quiz_start", "quiz_complete", "quiz_share",
+               "referred_visit", "referred_completion"]
 SMALL_SAMPLE = 30
 
 
@@ -57,8 +60,16 @@ def fmt(r):
     return "n/a" if r is None else f"{r:.0%}" if r <= 10 else f"{r:.2f}"
 
 
+def quiz_counts(events):
+    """Friend-zone quiz funnel: landings on the quiz page, then events tagged with the quiz scenario."""
+    n = Counter(e["n"] for e in events if e.get("scn") == QUIZ_SCN)
+    landing = sum(1 for e in events if e["n"] == "landing_view" and e.get("p") == "/friend-zone-quiz/")
+    return {"landing_view": landing, **{k: n[k] for k in QUIZ_FUNNEL[1:]}}
+
+
 def report(events, out=sys.stdout):
-    n = Counter(e["n"] for e in events)
+    # Challenge events: everything except the quiz's (referred_* events are shared names).
+    n = Counter(e["n"] for e in events if e.get("scn") != QUIZ_SCN)
     landing = sum(1 for e in events if e["n"] == "landing_view" and e.get("p") == "/rizz-test/")
     counts = {"landing_view": landing, **{k: n[k] for k in FUNNEL[1:]}}
 
@@ -100,14 +111,30 @@ def report(events, out=sys.stdout):
     for src, c in sorted(by_src.items(), key=lambda kv: -kv[1]["landing_view"]):
         w(f"  {src:<24} landings {c['landing_view']:>5}   starts {c['challenge_start']:>5}\n")
 
+    q = quiz_counts(events)
+    w("\nFriend-zone quiz funnel\n")
+    prev = None
+    for step in QUIZ_FUNNEL:
+        rate = f"  ({fmt(ratio(q[step], q[prev]))} of {prev})" if prev else ""
+        w(f"  {step:<22} {q[step]:>7}{rate}\n")
+        prev = step
+    types = Counter(e.get("rt", "?") for e in events if e["n"] == "quiz_complete" and e.get("scn") == QUIZ_SCN)
+    if types:
+        w("  result types: " + ", ".join(f"{t} {c}" for t, c in types.most_common()) + "\n")
+    quiz_via = Counter(e.get("via", "?") for e in events if e["n"] == "quiz_share_click")
+    if quiz_via:
+        w("  share clicks: " + ", ".join(f"{v} {c}" for v, c in quiz_via.most_common()) +
+          f"   card downloads: {sum(1 for e in events if e['n'] == 'quiz_card_download')}\n")
+
     w("\nSite-wide page views by path\n")
     for path, c in Counter(e.get("p", "?") for e in events if e["n"] == "landing_view").most_common(12):
         w(f"  {path:<40} {c}\n")
 
     small = [k for k in ("challenge_complete", "result_share", "referred_visit") if 0 < counts[k] < SMALL_SAMPLE]
+    small += [f"quiz {k}" for k in ("quiz_complete", "quiz_share") if 0 < q[k] < SMALL_SAMPLE]
     if small:
         w(f"\nCaution: small samples (<{SMALL_SAMPLE}) for {', '.join(small)}; treat rates as noise.\n")
-    w("\nAI cost per completed session: 0 (the challenge uses no AI). Hosting cost is fixed.\n")
+    w("\nAI cost per completed session: 0 (the challenge and quiz use no AI). Hosting cost is fixed.\n")
     return counts, multiplier
 
 

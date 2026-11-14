@@ -19,7 +19,7 @@
      replies or identifiers. Disabled unless <meta name="fl-analytics" content="on">. */
   var analyticsMeta = document.querySelector('meta[name="fl-analytics"]');
   var analyticsOn = !!(analyticsMeta && analyticsMeta.content === 'on' && navigator.sendBeacon);
-  var ONCE = { landing_view: 1, challenge_start: 1, referred_visit: 1, referred_completion: 1 };
+  var ONCE = { landing_view: 1, challenge_start: 1, quiz_start: 1, referred_visit: 1, referred_completion: 1 };
   var fired = {};
   var src = (function () {
     var m = /[?&]utm_source=([a-z0-9_-]{1,32})/i.exec(location.search);
@@ -66,59 +66,6 @@
     links.addEventListener('click', function (e) {
       if (e.target.tagName === 'A') { links.classList.remove('open'); menuBtn.setAttribute('aria-expanded', 'false'); }
     });
-  }
-
-  /* ---------- Self-check (questions live in the HTML) ---------- */
-  var form = document.getElementById('quiz');
-  var result = document.getElementById('quizResult');
-  var hint = document.getElementById('quizHint');
-  if (form && result) {
-    var items = Array.prototype.slice.call(form.querySelectorAll('.q-item'));
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var scores = [], missing = 0;
-      items.forEach(function (item) {
-        var c = item.querySelector('input:checked');
-        if (!c) missing++;
-        scores.push(c ? parseInt(c.value, 10) : 0);
-      });
-      if (missing) { hint.textContent = 'Answer all ' + items.length + ' to see your results (' + missing + ' left).'; return; }
-      hint.textContent = '';
-
-      var total = scores.reduce(function (a, b) { return a + b; }, 0);
-      var max = items.length * 2;
-      var title, text;
-      if (total <= 3) { title = 'You’re in good shape'; text = 'Your habits show interest and confidence. If there’s no spark, it may simply not be a match, and that’s okay.'; }
-      else if (total <= 8) { title = 'A few habits to tune'; text = 'Nothing dramatic, but a couple of patterns may be hiding your interest or your confidence. Start with these:'; }
-      else { title = 'Time for a reset'; text = 'Several habits are working against you. Each one is easy to practice. Pick one and focus on it this week:'; }
-
-      var flagged = items
-        .map(function (item, i) { return { area: item.getAttribute('data-area'), tip: item.getAttribute('data-tip'), s: scores[i] }; })
-        .filter(function (x) { return x.s > 0; })
-        .sort(function (a, b) { return b.s - a.s; });
-
-      result.textContent = '';
-      var eyebrow = document.createElement('p'); eyebrow.className = 'eyebrow'; eyebrow.textContent = 'Your result · ' + total + ' / ' + max;
-      var h = document.createElement('h3'); h.textContent = title;
-      var meter = document.createElement('div'); meter.className = 'meter'; meter.setAttribute('role', 'img'); meter.setAttribute('aria-label', 'Score ' + total + ' of ' + max);
-      var fill = document.createElement('div'); fill.style.width = Math.max(4, (total / max) * 100) + '%'; meter.appendChild(fill);
-      var p = document.createElement('p'); p.textContent = text;
-      result.append(eyebrow, h, meter, p);
-      if (flagged.length) {
-        var ul = document.createElement('ul'); ul.className = 'tip-list';
-        flagged.forEach(function (x) {
-          var li = document.createElement('li');
-          var b = document.createElement('b'); b.textContent = x.area + (x.s === 2 ? ' (often): ' : ' (sometimes): ');
-          li.append(b, document.createTextNode(x.tip));
-          ul.appendChild(li);
-        });
-        result.appendChild(ul);
-      }
-      result.hidden = false;
-      result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-    form.addEventListener('reset', function () { result.hidden = true; hint.textContent = ''; });
   }
 
   /* ---------- Footer year ---------- */
