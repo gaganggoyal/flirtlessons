@@ -115,6 +115,7 @@ section, article { scroll-margin-top: 70px; }
 .hero h1 em { color: var(--accent); font-style: italic; }
 .lead { font-size: 1.15rem; color: var(--muted); max-width: 560px; margin-bottom: 30px; }
 .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.hero-note { margin: 16px 0 0; font-size: 14px; color: var(--muted); }
 .phone { background: var(--surface); border: 1px solid var(--rule); border-radius: 28px; padding: 28px 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px; max-width: 380px; justify-self: center; width: 100%; }
 .bubble { display: block; max-width: 82%; padding: 10px 14px; border-radius: 18px; font-size: 15px; line-height: 1.4; }
 .bubble.you { align-self: flex-end; background: var(--accent); color: var(--accent-ink); border-bottom-right-radius: 6px; }
@@ -343,4 +344,44 @@ section, article { scroll-margin-top: 70px; }
   html { scroll-behavior: auto; }
   .typing span { animation: none; }
   .btn, .card { transition: none; }
+}
+
+/* ---------- 3-message challenge ---------- */
+.challenge { background: var(--surface); border: 1px solid var(--rule); border-radius: 22px; padding: 28px; box-shadow: var(--shadow); margin: 0 0 40px; max-width: 720px; }
+.beat-banner { background: var(--accent); color: var(--accent-ink); border-radius: 12px; padding: 12px 16px; font-weight: 600; margin: 0 0 20px; }
+.profile-card { display: flex; gap: 16px; align-items: center; background: var(--tint); border-radius: 16px; padding: 16px 18px; margin-bottom: 18px; }
+.avatar { flex: 0 0 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, #f0a35e, var(--accent)); color: #fff; font-family: var(--display); font-weight: 700; font-size: 24px; }
+.avatar.sm { flex-basis: 32px; width: 32px; height: 32px; font-size: 15px; }
+.ch-name { font-weight: 700; margin: 0 0 4px; }
+.ch-tag { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); background: var(--surface); border: 1px solid var(--rule); border-radius: 999px; padding: 2px 8px; margin-left: 6px; vertical-align: 2px; }
+.ch-bio { margin: 0; color: var(--muted); font-style: italic; }
+.ch-head { display: flex; align-items: center; gap: 10px; font-weight: 600; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+.ch-progress { margin-left: auto; font-size: 13px; font-weight: 500; color: var(--muted); }
+.ch-log { display: flex; flex-direction: column; gap: 10px; padding: 18px 0; min-height: 60px; }
+.ch-prompt { font-size: 14px; font-weight: 600; color: var(--accent); margin: 4px 0 10px; }
+.ch-choices { display: flex; flex-direction: column; gap: 10px; }
+.choice { text-align: left; font: inherit; font-size: 15.5px; line-height: 1.45; color: var(--text); background: var(--bg); border: 1.5px solid var(--rule); border-radius: 14px; padding: 12px 16px; cursor: pointer; transition: border-color .15s ease, background .15s ease; }
+.choice:hover, .choice:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+.ch-score { font-family: var(--display); font-weight: 700; font-size: clamp(4rem, 14vw, 6.5rem); line-height: 1; color: var(--ink); }
+.ch-score small { font-size: .38em; color: var(--muted); margin-left: 4px; }
+.ch-result h2 { color: var(--accent); font-style: italic; margin: 6px 0 8px; font-size: clamp(1.6rem, 4vw, 2.1rem); }
+.ch-result h2:focus { outline: none; }
+.ch-compare { font-weight: 600; background: var(--accent-soft); border-radius: 12px; padding: 10px 14px; }
+.ch-traits { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0; }
+.ch-traits div { background: var(--tint); border-radius: 14px; padding: 14px 16px; }
+.ch-traits span { display: block; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.ch-traits b { font-size: 1.05rem; }
+.ch-tip { background: var(--surface); border: 1px dashed var(--rule); border-radius: 14px; padding: 14px 16px; }
+.ch-share { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 6px; }
+.ch-share .btn { padding: 11px 18px; font-size: 14px; }
+.ch-breakdown { margin: 18px 0; }
+.ch-breakdown summary { cursor: pointer; font-weight: 600; }
+.ch-breakdown ol { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 10px; }
+.ch-breakdown li { display: flex; gap: 14px; background: var(--tint); border-radius: 12px; padding: 12px 14px; }
+.bd-pts { flex: 0 0 auto; font-weight: 700; color: var(--accent); }
+.bd-text { margin: 0 0 4px; font-weight: 500; }
+.bd-why { margin: 0; color: var(--muted); font-size: 14.5px; }
+@media (max-width: 560px) {
+  .challenge { padding: 18px; border-radius: 18px; }
+  .ch-traits { grid-template-columns: 1fr; }
 }

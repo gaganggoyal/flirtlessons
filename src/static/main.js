@@ -13,6 +13,32 @@
   };
   if (location.pathname === '/' && moved[location.hash]) { location.replace(moved[location.hash]); return; }
 
+  /* ---------- Funnel events (see docs/measurement.md) ----------
+     First-party and cookieless: a beacon to /e with an event name and a few
+     coarse fields (path, scenario id, score bucket, source). Never free text,
+     replies or identifiers. Disabled unless <meta name="fl-analytics" content="on">. */
+  var analyticsMeta = document.querySelector('meta[name="fl-analytics"]');
+  var analyticsOn = !!(analyticsMeta && analyticsMeta.content === 'on' && navigator.sendBeacon);
+  var ONCE = { landing_view: 1, challenge_start: 1, referred_visit: 1, referred_completion: 1 };
+  var fired = {};
+  var src = (function () {
+    var m = /[?&]utm_source=([a-z0-9_-]{1,32})/i.exec(location.search);
+    if (m) return m[1].toLowerCase();
+    try { return document.referrer ? new URL(document.referrer).hostname.replace(/^www\./, '').slice(0, 64) : 'direct'; }
+    catch (e) { return 'direct'; }
+  })();
+  window.flTrack = function (name, props) {
+    if (!analyticsOn || !/^[a-z_]{3,40}$/.test(name)) return;
+    if (ONCE[name]) { if (fired[name]) return; fired[name] = 1; }
+    var q = 'n=' + name + '&p=' + encodeURIComponent(location.pathname) + '&src=' + encodeURIComponent(src);
+    for (var k in (props || {})) {
+      var v = props[k];
+      if (v !== '' && v != null && /^[a-z]{1,8}$/.test(k)) q += '&' + k + '=' + encodeURIComponent(String(v).slice(0, 40));
+    }
+    try { navigator.sendBeacon('/e?' + q); } catch (e) {}
+  };
+  window.flTrack('landing_view');
+
   var root = document.documentElement;
   function save(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
   function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }

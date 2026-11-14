@@ -1,0 +1,23 @@
+# Flirt Lessons — flirtlessons.com
+# Static files live in /var/www/flirtlessons. This container serves them on the
+# shared edge network; the main edge Caddy (cricketverse_deploy-caddy-1) handles
+# TLS and proxies flirtlessons.com -> flirtlessons-web:80.
+# No host ports are published, and updating the site never touches the edge.
+# To update content: copy new files into /var/www/flirtlessons (no restart needed).
+services:
+  web:
+    image: caddy:2-alpine
+    container_name: flirtlessons-web
+    restart: unless-stopped
+    volumes:
+      - /var/www/flirtlessons:/srv:ro
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - edge
+
+networks:
+  # The host's existing edge network. External so `docker compose down` here
+  # can never delete it.
+  edge:
+    name: cricketverse_deploy_default
+    external: true

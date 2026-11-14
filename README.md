@@ -30,10 +30,24 @@ JSON-LD (Article, BreadcrumbList, FAQPage), breadcrumbs, previous/next links,
 
 1. Create `src/pages/<slug>.html` with a meta header (copy an existing lesson).
 2. To put it in the lesson or tool series, add the slug to `LESSONS` or `TOOLS` in `build.py`.
+   Optional meta: `og_image` (path under `src/static/`), `og_title`, `scripts` (extra JS files), `related`.
 3. Run `python3 build.py`. It is published at `/<slug>/` and added to the sitemap.
 
 FAQ entries written as `<details><summary>Q</summary><p>A</p></details>` are
 picked up automatically for FAQPage structured data.
+
+## Tests
+
+```sh
+python3 -m unittest discover -s tests   # build + SEO guarantees, funnel report
+node --test tests/                      # 3-message challenge engine (every answer path)
+```
+
+## Docs
+
+- `docs/measurement.md`: funnel events (built, switched off), dashboard, privacy design
+- `deploy/README.md`: hosting setup and server changes waiting for approval
+- `tools/events_report.py`: funnel report from the event log
 
 ## Deploy
 

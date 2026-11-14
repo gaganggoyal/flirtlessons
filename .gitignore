@@ -9,3 +9,7 @@ reference/
 
 .DS_Store
 __pycache__/
+
+# Private working notes, audits and marketing drafts (not for a public repo)
+reports/
+research_notes/
