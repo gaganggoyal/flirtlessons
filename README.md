@@ -51,7 +51,7 @@ node --test tests/                      # challenge engine (every answer path) a
 
 ## Docs
 
-- `docs/measurement.md`: funnel events (on in code, live after the next deploy), dashboard, privacy design
+- `docs/measurement.md`: funnel events (live since 14 Nov 2026), dashboard, privacy design
 - `deploy/README.md`: hosting setup and server changes waiting for approval
 
 ## Deploy

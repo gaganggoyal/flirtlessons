@@ -13,14 +13,16 @@ The site is served by a small Caddy container, `flirtlessons-web`, on the VPS:
 
 | Change | Where | Status |
 |---|---|---|
-| Redirect `/index.html` and `/<page>/index.html` to the clean URL (removes duplicate URLs) | `deploy/Caddyfile` | Ready, **not applied yet** (tested in a throwaway container on 14 Nov 2026) |
-| Long cache for `challenge.js` and `quiz.js` (content-hashed like the others) | `deploy/Caddyfile` | Ready, **not applied yet** |
-| Direct requests for `/404.html` return 404 instead of 200 | `deploy/Caddyfile` | Ready, **not applied and not yet tested**: check it in the throwaway container step below |
-| Funnel-events endpoint `/e` with an IP-free log | `deploy/Caddyfile`, `docker-compose.yml` | Ready, **not applied yet** (tested in a throwaway container; `docs/measurement.md`) |
+| Redirect `/index.html` and `/<page>/index.html` to the clean URL (removes duplicate URLs) | `deploy/Caddyfile` | **Applied 14 Nov 2026** |
+| Long cache for `challenge.js` and `quiz.js` (content-hashed like the others) | `deploy/Caddyfile` | **Applied 14 Nov 2026** |
+| Direct requests for `/404.html` return 404 instead of 200 | `deploy/Caddyfile` | **Applied 14 Nov 2026** (tested in a throwaway container first) |
+| Funnel-events endpoint `/e` with an IP-free log | `deploy/Caddyfile`, `docker-compose.yml` | **Applied 14 Nov 2026**; log has no IP or headers (verified live) |
 | `http://www.flirtlessons.com` → `https://flirtlessons.com` in one hop (today it takes two) | shared edge Caddyfile | Proposed. Add a block `http://www.flirtlessons.com { redir https://flirtlessons.com{uri} permanent }`, validate, reload. Low impact. |
 | IPv6 (AAAA record) | DNS | **Don't add yet.** The server has an IPv6 address, but outbound IPv6 failed in testing; publishing AAAA before IPv6 works would break IPv6-only visitors. |
 
-## Apply the container changes (after approval)
+## Applying container changes
+
+Backups of the previous config are on the server as `*.bak-202611140835`.
 
 1. Test the new config against the live files in a throwaway container (production untouched):
 

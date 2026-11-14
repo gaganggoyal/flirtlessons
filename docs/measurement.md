@@ -1,8 +1,7 @@
 # Measurement: funnel events
 
-Status: **switched on in code** (`ANALYTICS_ENABLED = True`, with the matching privacy text on `/legal/`).
-It goes live with the next deploy of the site **and** the container config in `deploy/` (the `/e`
-endpoint and log). Until both are deployed, nothing is collected.
+Status: **live since 14 November 2026** (site and container config deployed together), with the
+matching privacy text on `/legal/`. Log: `/root/flirtlessons/logs/events.log` on the server.
 To stop it: set `ANALYTICS_ENABLED = False` in `build.py`, comment out the events block in
 `deploy/Caddyfile`, redeploy both. The log can be deleted at any time.
 
