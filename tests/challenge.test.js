@@ -89,7 +89,18 @@ test('score buckets are coarse and cover 0..100', () => {
   assert.equal(C.scoreBucket(100), '90-100');
 });
 
-test('analytics stays off in the shipped layout unless explicitly enabled', () => {
+test('analytics can only be on if the privacy policy discloses it', () => {
   const build = fs.readFileSync(path.join(__dirname, '../build.py'), 'utf8');
-  assert.match(build, /^ANALYTICS_ENABLED = False$/m);
+  const legal = fs.readFileSync(path.join(__dirname, '../src/pages/legal.html'), 'utf8');
+  const on = /^ANALYTICS_ENABLED = True$/m.test(build);
+  assert.ok(on || /^ANALYTICS_ENABLED = False$/m.test(build), 'flag must be a literal True/False');
+  if (on) assert.match(legal, /Anonymous usage counts/, 'privacy page must disclose the counts');
+  else assert.doesNotMatch(legal, /Anonymous usage counts/, 'privacy page claims counts that are not collected');
+});
+
+test('events never carry reply text', () => {
+  const src = fs.readFileSync(path.join(__dirname, '../src/static/challenge.js'), 'utf8');
+  for (const m of src.matchAll(/track\('([a-z_]+)', \{([^}]*)\}/g)) {
+    assert.doesNotMatch(m[2], /text|reply|picks|why/, `${m[1]} sends ${m[2]}`);
+  }
 });

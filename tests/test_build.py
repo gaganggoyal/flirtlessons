@@ -82,9 +82,12 @@ class BuildTest(unittest.TestCase):
                 if m and 'rel="canonical"' not in tag:
                     self.fail(f"{f}: third-party resource {m.group(1)}")
 
-    def test_analytics_meta_is_off(self):
+    def test_analytics_flag_matches_privacy_policy(self):
+        legal = self.pages[SITE / "legal" / "index.html"]
+        disclosed = "Anonymous usage counts" in legal
+        expected = "on" if disclosed else "off"
         for f, s in self.pages.items():
-            self.assertIn('<meta name="fl-analytics" content="off">', s, f)
+            self.assertIn(f'<meta name="fl-analytics" content="{expected}">', s, f)
 
     def test_challenge_page_loads_its_script_and_has_custom_preview(self):
         s = self.pages[SITE / "rizz-test" / "index.html"]

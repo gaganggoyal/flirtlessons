@@ -31,9 +31,9 @@ OG_IMAGE = BASE + "/og-image.png"
 OG_ALT = "Flirt Lessons — how to flirt with confidence and respect"
 MARKER = ".generated"
 
-# First-party, cookieless event beacon (see docs/measurement.md). Off until the owner
-# approves it AND the privacy policy is updated; while off, track() is a no-op.
-ANALYTICS_ENABLED = False
+# First-party, cookieless event beacon (see docs/measurement.md). Turned on 2026-11-14
+# together with the privacy policy text on /legal/. Set to False to stop all events.
+ANALYTICS_ENABLED = True
 
 # Reading order. Drives home-page cards, previous/next links and "keep learning".
 LESSONS = [

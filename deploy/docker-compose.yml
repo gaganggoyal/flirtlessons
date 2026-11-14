@@ -12,6 +12,7 @@ services:
     volumes:
       - /var/www/flirtlessons:/srv:ro
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./logs:/logs   # anonymous funnel events only (docs/measurement.md)
     networks:
       - edge
 

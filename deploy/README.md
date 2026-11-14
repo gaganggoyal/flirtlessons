@@ -9,13 +9,13 @@ The site is served by a small Caddy container, `flirtlessons-web`, on the VPS:
 - `admin off` is set, so after changing the Caddyfile run `docker restart flirtlessons-web`
   (edit the file in place; the container bind-mounts that exact file).
 
-## Changes waiting for owner approval
+## Server changes
 
 | Change | Where | Status |
 |---|---|---|
-| Redirect `/index.html` and `/<page>/index.html` to the clean URL (removes duplicate URLs) | `deploy/Caddyfile` | Ready. Tested in a throwaway container: 301s, no loops. |
-| Long cache for `challenge.js` (it is content-hashed like the others) | `deploy/Caddyfile` | Ready. |
-| Funnel-events endpoint `/e` with an IP-free log | `deploy/Caddyfile` (commented out) | Ready, off. Needs privacy approval: see `docs/measurement.md`. |
+| Redirect `/index.html` and `/<page>/index.html` to the clean URL (removes duplicate URLs) | `deploy/Caddyfile` | **Applied 2026-11-14** |
+| Long cache for `challenge.js` (it is content-hashed like the others) | `deploy/Caddyfile` | **Applied 2026-11-14** |
+| Funnel-events endpoint `/e` with an IP-free log | `deploy/Caddyfile`, `docker-compose.yml` | **Applied 2026-11-14** (`docs/measurement.md`) |
 | `http://www.flirtlessons.com` → `https://flirtlessons.com` in one hop (today it takes two) | shared edge Caddyfile | Proposed. Add a block `http://www.flirtlessons.com { redir https://flirtlessons.com{uri} permanent }`, validate, reload. Low impact. |
 | IPv6 (AAAA record) | DNS | **Don't add yet.** The server has an IPv6 address, but outbound IPv6 failed in testing; publishing AAAA before IPv6 works would break IPv6-only visitors. |
 

@@ -1,7 +1,8 @@
 # Measurement: funnel events
 
-Status: **built but switched off.** Turning it on changes the privacy promise on
-`/legal/`, so it needs the owner's approval (see "Enabling" below).
+Status: **on since 14 November 2026**, together with the matching privacy text on `/legal/`.
+To stop it: set `ANALYTICS_ENABLED = False` in `build.py`, comment out the events block in
+`deploy/Caddyfile`, redeploy both. The log can be deleted at any time.
 
 ## Design
 
@@ -74,7 +75,7 @@ the existing fixed-cost VPS. Analytics adds a small log file (rotated at 10 MB, 
 **Known limits:** reloading a referred link counts a second `referred_visit`; ad blockers may block
 `/e`; bots that run JavaScript can inflate `landing_view`. Report absolute counts next to every rate.
 
-## Enabling (owner approval required)
+## Enabling (reference: how it was switched on)
 
 1. Approve the change to the privacy policy below.
 2. `build.py`: set `ANALYTICS_ENABLED = True`.

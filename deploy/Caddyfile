@@ -13,37 +13,34 @@
 	@indexFile path_regexp idx ^(.*/)index\.html$
 	redir @indexFile {re.idx.1} permanent
 
-	# ---- Funnel events (OFF until the owner approves; see docs/measurement.md) ----
-	# To enable: uncomment this block, mount ./logs:/logs in docker-compose.yml,
-	# set ANALYTICS_ENABLED = True in build.py and publish the updated privacy text.
-	# The inner container never sees visitor IPs (the edge proxy does not forward a
-	# trusted client IP), and the log filter also drops all headers, so the log
-	# holds only time, path and the coarse event fields in the query string.
-	#
-	# handle /e {
-	# 	respond 204
-	# }
-	# @notEvents not path /e
-	# log_skip @notEvents
-	# log {
-	# 	output file /logs/events.log {
-	# 		roll_size 10MiB
-	# 		roll_keep 10
-	# 	}
-	# 	format filter {
-	# 		wrap json
-	# 		fields {
-	# 			request>host delete
-	# 			request>remote_ip delete
-	# 			request>remote_port delete
-	# 			request>client_ip delete
-	# 			request>headers delete
-	# 			request>tls delete
-	# 			resp_headers delete
-	# 			user_id delete
-	# 		}
-	# 	}
-	# }
+	# ---- Funnel events (see docs/measurement.md) ----
+	# The container never sees visitor IPs (the edge proxy doesn't forward a trusted
+	# client IP) and the filter drops host, IP and header fields, so each line holds
+	# only time, method, status and the /e?... URI. Logs live in /root/flirtlessons/logs.
+	handle /e {
+		respond 204
+	}
+	@notEvents not path /e
+	log_skip @notEvents
+	log {
+		output file /logs/events.log {
+			roll_size 10MiB
+			roll_keep 10
+		}
+		format filter {
+			wrap json
+			fields {
+				request>host delete
+				request>remote_ip delete
+				request>remote_port delete
+				request>client_ip delete
+				request>headers delete
+				request>tls delete
+				resp_headers delete
+				user_id delete
+			}
+		}
+	}
 
 	file_server
 
